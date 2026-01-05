@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - RKA</title>
+  <style> body{font-family:Arial;margin:20px;} table, th, td{border:1px solid #ccc;border-collapse:collapse;padding:5px;} </style>
+</head>
+<body>
+<h1>Admin Dashboard</h1>
+
+<h2>All Students</h2>
+<table id="students"><tr><th>ID</th><th>Student ID</th><th>Full Name</th></tr></table>
+
+<h2>Attendance Logs</h2>
+<table id="attendance"><tr><th>ID</th><th>Student ID</th><th>Date</th><th>Time In</th><th>Time Out</th></tr></table>
+
+<h2>Attendance Analytics</h2>
+<table id="analytics"><tr><th>Date</th><th>Present</th></tr></table>
+
+<script>
+fetch('/admin/students').then(r=>r.json()).then(res=>{
+  const table=document.getElementById('students');
+  res.forEach(s=>table.innerHTML += `<tr><td>${s.id}</td><td>${s.student_id}</td><td>${s.fullname}</td></tr>`);
+});
+fetch('/admin/attendance').then(r=>r.json()).then(res=>{
+  const table=document.getElementById('attendance');
+  res.forEach(a=>table.innerHTML += `<tr><td>${a.id}</td><td>${a.student_id}</td><td>${a.date}</td><td>${a.time_in}</td><td>${a.time_out}</td></tr>`);
+});
+fetch('/admin/analytics').then(r=>r.json()).then(res=>{
+  const table=document.getElementById('analytics');
+  res.forEach(a=>table.innerHTML += `<tr><td>${a.date}</td><td>${a.present}</td></tr>`);
+});
+</script>
+</body>
+</html>
