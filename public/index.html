@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RKA Portal Login</title>
+  <style>
+    body { font-family: Arial; background:#f0f2f5; text-align:center; padding-top:50px; }
+    input, select { margin:10px; padding:8px; width:200px; }
+    button { padding:8px 20px; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <h1>Rejoice Kinship Academy Portal</h1>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <select id="role">
+    <option value="teacher">Teacher</option>
+    <option value="parent">Parent</option>
+    <option value="admin">Admin</option>
+  </select><br>
+  <button onclick="login()">Login</button>
+
+  <script>
+    function login(){
+      fetch('/auth/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          email: document.getElementById('email').value,
+          password: document.getElementById('password').value,
+          role: document.getElementById('role').value
+        })
+      }).then(r=>r.json()).then(res=>{
+        if(res.success){
+          alert(res.success);
+          localStorage.setItem('user', JSON.stringify(res.user));
+          if(res.user.role==='teacher') location.href='teacher.html';
+          if(res.user.role==='parent') location.href='parent.html';
+          if(res.user.role==='admin') location.href='admin.html';
+        } else alert(res.error);
+      });
+    }
+  </script>
+</body>
+    </html>
