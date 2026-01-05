@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Attendance - RKA</title>
+</head>
+<body>
+  <h2>Rejoice Kinship Academy</h2>
+  <input id="studentId" placeholder="Enter Student ID" />
+  <input id="lat" type="hidden" />
+  <input id="long" type="hidden" />
+  <button onclick="markArrival()">Mark Arrival</button>
+  <button onclick="markDeparture()">Mark Departure</button>
+
+  <script>
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('lat').value = pos.coords.latitude;
+    document.getElementById('long').value = pos.coords.longitude;
+  });
+
+  function markArrival(){
+    fetch('/student/arrival',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        student_id:document.getElementById('studentId').value,
+        lat:document.getElementById('lat').value,
+        long:document.getElementById('long').value
+      })
+    }).then(r=>r.json()).then(a=>alert(a.success||a.error));
+  }
+
+  function markDeparture(){
+    fetch('/student/departure',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        student_id:document.getElementById('studentId').value,
+        lat:document.getElementById('lat').value,
+        long:document.getElementById('long').value
+      })
+    }).then(r=>r.json()).then(a=>alert(a.success||a.error));
+  }
+  </script>
+</body>
+</html>
