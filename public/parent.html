@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parent Dashboard - RKA</title>
+  <style>
+    body { font-family: Arial; margin:20px; }
+    #chat { border:1px solid #ccc; padding:10px; height:200px; overflow-y:scroll; }
+    input, button, textarea { margin:5px; padding:5px; }
+  </style>
+</head>
+<body>
+<h1>Parent Dashboard</h1>
+
+<h2>Chat with Teachers</h2>
+<div id="chat"></div>
+<input id="receiver" placeholder="Teacher ID">
+<input id="message" placeholder="Message">
+<button onclick="sendMessage()">Send</button>
+
+<h2>Submit Opinion</h2>
+<select id="category">
+  <option>Suggestion</option>
+  <option>Complaint</option>
+  <option>Praise</option>
+</select><br>
+<textarea id="opinionMsg" placeholder="Write your opinion"></textarea><br>
+<button onclick="submitOpinion()">Submit</button>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const parent = JSON.parse(localStorage.getItem('user'));
+
+// Load chat
+function loadChat(){
+  fetch('/parent/messages/'+parent.id).then(r=>r.json()).then(res=>{
+    const chatDiv = document.getElementById('chat');
+    chatDiv.innerHTML = '';
+    res.forEach(m=>{
+      chatDiv.innerHTML += `<p><b>${m.sender_id}:</b> ${m.message}</p>`;
+    });
+  });
+}
+function sendMessage(){
+  const receiver = document.getElementById('receiver').value;
+  const msg = document.getElementById('message').value;
+  socket.emit('sendMessage',{sender_id:parent.id, receiver_id:receiver, message:msg});
+  loadChat();
+}
+socket.on('receiveMessage', loadChat);
+loadChat();
+
+// Submit opinion
+function submitOpinion(){
+  const category = document.getElementById('category').value;
+  const message = document.getElementById('opinionMsg').value;
+  fetch('/parent/opinion',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({parent_id:parent.id, category, message})
+  }).then(r=>r.json()).then(a=>alert(a.success||a.error));
+}
+</script>
+</body>
+</html>
