@@ -59,4 +59,4 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 -- Optional: sample admin user
 INSERT INTO users (name,email,password,role) VALUES
-('Admin','admin@rka.com','$2b$10$hashedpasswordhere','admin');
+('Admin','admin@rka.com','RKAhashedpasswordhere','admin');
