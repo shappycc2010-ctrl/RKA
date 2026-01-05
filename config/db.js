@@ -1,10 +1,11 @@
 const mysql = require('mysql');
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', // your MySQL password
-  database: 'rka_portal'
+  host: 'your-db-host.mysql.render.com',
+  user: 'your_username',
+  password: 'your_password',
+  database: 'rka_portal',
+  port: 3306
 });
 
 db.connect(err => {
