@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Dashboard - RKA</title>
+  <style>
+    body { font-family: Arial; margin:20px; }
+    #chat { border:1px solid #ccc; padding:10px; height:200px; overflow-y:scroll; }
+    input, button, select, textarea { margin:5px; padding:5px; }
+  </style>
+</head>
+<body>
+<h1>Teacher Dashboard</h1>
+
+<h2>Chat with Parents</h2>
+<div id="chat"></div>
+<input id="receiver" placeholder="Parent ID">
+<input id="message" placeholder="Message">
+<button onclick="sendMessage()">Send</button>
+
+<h2>Parent Opinions</h2>
+<select id="opinionId"></select>
+<select id="status">
+  <option value="New">New</option>
+  <option value="Reviewed">Reviewed</option>
+  <option value="Closed">Closed</option>
+</select>
+<button onclick="updateStatus()">Update Status</button>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const teacher = JSON.parse(localStorage.getItem('user'));
+function loadChat(){
+  fetch('/teacher/messages/'+teacher.id)
+  .then(r=>r.json()).then(res=>{
+    const chatDiv = document.getElementById('chat');
+    chatDiv.innerHTML = '';
+    res.forEach(m=>{
+      chatDiv.innerHTML += `<p><b>${m.sender_id}:</b> ${m.message}</p>`;
+    });
+  });
+}
+function sendMessage(){
+  const receiver = document.getElementById('receiver').value;
+  const msg = document.getElementById('message').value;
+  socket.emit('sendMessage',{sender_id:teacher.id, receiver_id:receiver, message:msg});
+  loadChat();
+}
+socket.on('receiveMessage', loadChat);
+loadChat();
+
+// Load opinions
+fetch('/teacher/opinions').then(r=>r.json()).then(res=>{
+  const sel = document.getElementById('opinionId');
+  res.forEach(o=>{
+    sel.innerHTML += `<option value="${o.id}">${o.parent_name}: ${o.message} [${o.status}]</option>`;
+  });
+});
+function updateStatus(){
+  const id = document.getElementById('opinionId').value;
+  const status = document.getElementById('status').value;
+  fetch('/teacher/opinions/'+id+'/status',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status})
+  }).then(r=>r.json()).then(a=>alert(a.success||a.error));
+}
+</script>
+</body>
+</html>
